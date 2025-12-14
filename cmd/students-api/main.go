@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Mandar-Pandya/students-api/internal/config"
+	"github.com/Mandar-Pandya/students-api/internal/http/handlers/student"
 )
 
 func main() {
@@ -20,9 +21,7 @@ func main() {
 	// setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to students api"))
-	})
+	router.HandleFunc("POST /api/students", student.New())
 
 	// setup server
 
@@ -48,13 +47,12 @@ func main() {
 
 	slog.Info("shutting down the server")
 
-	ctx,cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
 	defer cancel()
 
-	if err := server.Shutdown(ctx);
-	err != nil{
-		slog.Error("Failed to shut down server",slog.String("error",err.Error()))
+	if err := server.Shutdown(ctx); err != nil {
+		slog.Error("Failed to shut down server", slog.String("error", err.Error()))
 	}
 
 	slog.Info("server shutdown successfully")
