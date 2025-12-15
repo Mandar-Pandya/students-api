@@ -8,12 +8,13 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/Mandar-Pandya/students-api/internal/storage"
 	"github.com/Mandar-Pandya/students-api/internal/types"
 	"github.com/Mandar-Pandya/students-api/internal/utils/response"
 	"github.com/go-playground/validator/v10"
 )
 
-func New() http.HandlerFunc {
+func New(storage storage.Storage) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -39,8 +40,17 @@ func New() http.HandlerFunc {
 			return
 		}
 
-		response.WriteJson(w, http.StatusCreated, map[string]string{
-			"status": "ok",
+		lastId, err := storage.CreateStudent(
+			student.Name, student.Email, int64(student.Age),
+		)
+
+		if err != nil {
+			response.WriteJson(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		response.WriteJson(w, http.StatusCreated, map[string]int64{
+			"id": lastId,
 		})
 
 	}
